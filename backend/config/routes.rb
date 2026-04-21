@@ -1,14 +1,11 @@
 Rails.application.routes.draw do
-  root to: proc {
-    [200, { "Content-Type" => "application/json" }, [{ message: "FixMate API running" }.to_json]]
-  }
-
-  devise_for :users, 
-             path: 'api/v1/auth', 
+  # API routes under /api/v1
+  devise_for :users,
+             path: 'api/v1/auth',
              controllers: {
                sessions: 'api/v1/users/sessions',
                registrations: 'api/v1/users/registrations'
-             }, 
+             },
              path_names: {
                sign_in: 'login',
                sign_out: 'logout',
@@ -36,7 +33,7 @@ Rails.application.routes.draw do
           patch :cancel
         end
       end
-      
+
       resources :cities, only: [:index]
       resources :categories, only: [:index]
       resources :notifications, only: [:index] do

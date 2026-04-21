@@ -192,6 +192,8 @@ The frontend will be available at **http://localhost:3000**
 | Backend    | http://localhost:3001        | Rails default page          |
 | API Health | http://localhost:3001/api/v1/cities | Should return JSON list of cities |
 
+> **📌 Note:** For Option B (combined deployment), after building and copying frontend files to `backend/public/`, visiting `http://localhost:3001/` will show the frontend home page, and API calls will work via relative paths.
+
 ---
 
 ## 📁 Project Structure
@@ -244,7 +246,10 @@ fixmate/
 
 ## 📡 API Reference
 
-Base URL: `http://localhost:3001/api/v1`
+Base URL:
+- Development: `http://localhost:3001/api/v1`
+- Production (Option A - Separate): Use your deployed backend URL (e.g., `https://fixmate-api.onrender.com/api/v1`)
+- Production (Option B - Combined): `/api/v1` (relative path, same domain as frontend)
 
 ### Authentication
 
@@ -424,7 +429,11 @@ const api = axios.create({
 
 ## 🐳 Deployment
 
-### Docker (Backend)
+### Option A: Separate Deployments (Recommended)
+
+Deploy backend and frontend as separate services:
+
+#### Backend (Docker / Kamal / Render)
 
 ```bash
 cd backend
@@ -439,8 +448,6 @@ docker run -d -p 80:80 \
   fixmate-backend
 ```
 
-### Kamal (Recommended for Production)
-
 The backend is pre-configured for [Kamal](https://kamal-deploy.org/) deployment:
 
 ```bash
@@ -449,7 +456,7 @@ kamal setup    # First-time deployment
 kamal deploy   # Subsequent deployments
 ```
 
-### Frontend (Vercel / Node.js)
+#### Frontend (Vercel / Node.js / Static Hosting)
 
 ```bash
 cd frontend
@@ -462,6 +469,36 @@ npm start
 ```
 
 > **💡 Tip:** The Next.js frontend can be easily deployed to [Vercel](https://vercel.com/) with zero configuration.
+
+### Option B: Combined Deployment (Backend serves Frontend)
+
+Serve the frontend from the backend at the root path, with API routes under `/api`:
+
+#### 1. Build Frontend as Static Files
+
+```bash
+cd frontend
+npm run build
+```
+
+This generates static files in the `out/` directory.
+
+#### 2. Copy Frontend to Backend Public Folder
+
+```bash
+# Copy built frontend to backend public directory
+cp -r frontend/out/* backend/public/
+```
+
+#### 3. Deploy Backend
+
+The backend is now configured to:
+- Serve API routes under `/api/v1/*`
+- Serve frontend static files for all other routes
+
+Deploy the backend using Docker, Kamal, or Render as shown above.
+
+> **⚠️ Note:** When using this option, frontend API calls use relative paths (`/api/v1`) which resolve to the backend on the same domain.
 
 ---
 
