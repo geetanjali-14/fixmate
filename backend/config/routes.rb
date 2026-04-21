@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  root to: proc {
+    [200, { "Content-Type" => "application/json" }, [{ message: "FixMate API running" }.to_json]]
+  }
+
   devise_for :users, 
              path: 'api/v1/auth', 
              controllers: {
